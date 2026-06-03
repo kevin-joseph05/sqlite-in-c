@@ -8,7 +8,7 @@
 #include "io_helpers.h"
 
 
-ssize_t get_input(char **in_ptr) {
+ssize_t get_input(InputBuffer* inbuf) {
     int read_len;
     int retval;
     int while_check = true;
@@ -17,7 +17,7 @@ ssize_t get_input(char **in_ptr) {
     int bread = 0; 
 
     while (while_check) {
-        int retval = read(STDIN_FILENO, *in_ptr + pos, MAX_STR_LEN);
+        int retval = read(STDIN_FILENO, inbuf->input_buf + pos, MAX_STR_LEN);
         int read_len = retval;
 
         if (read_len == -1) {
@@ -25,6 +25,11 @@ ssize_t get_input(char **in_ptr) {
         } else if (read_len == 0) {
             while_check = false;
         } else if (read_len < curr_size) {
+            bread += read_len;
+            inbuf->input_length = bread;
+            inbuf->buffer_length = curr_size;
+
+
             while_check = false;
         }
 
@@ -32,7 +37,7 @@ ssize_t get_input(char **in_ptr) {
         if (read_len == curr_size) {
             bread += read_len;
             curr_size *= 2;
-            *in_ptr = realloc(*in_ptr, curr_size);
+            inbuf->input_buf = realloc(inbuf->input_buf, curr_size);
             pos += bread;
             // do some realloc error handling here 
             // i want at this point to continue reading from the new/updated position 
