@@ -48,11 +48,17 @@ ssize_t get_input(InputBuffer* inbuf) {
     //in_ptr[read_len] = '\0';
     return retval;
 }
-/**
- * i need to rework this function to satisfy this logic
- *
- * Read 1 byte
- * If it's \n or EOF, stop
- * Otherwise, if you've hit your current buffer limit, realloc to double
- * Go back to 1
-**/
+
+size_t tokenize_input(char *in_ptr, char **tokens) {
+    char *curr_ptr = strtok (in_ptr, DELIMITERS);
+    size_t token_count = 0;
+
+    while (curr_ptr != NULL) {  
+        tokens[token_count] = curr_ptr;
+        token_count++;
+        curr_ptr = strtok(NULL, DELIMITERS);
+    }
+    tokens[token_count] = NULL;
+    return token_count;
+}
+
